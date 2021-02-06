@@ -1,4 +1,4 @@
-export const movies = [
+export const top10 = [
     {
         "id": 102091,
         "title": "The Shawshank Redemption",
