@@ -1,7 +1,10 @@
 import React from "react";
 import StarRating from "./StarRating";
 import { FaThumbsUp } from "react-icons/fa";
+import { useHistory } from "react-router-dom"
+
 export default function Movie(props) {
+  const history = useHistory();
   const onLike = props.onLike;
   const m = props.movie;
   return (
@@ -22,6 +25,7 @@ export default function Movie(props) {
           <small> {m.likes ? m.likes : 0}</small>
         </li>
       </ul>
+      <button className="primary" onClick={() => history.push(`/movies/${m.id}/edit`)}>Edit</button>
     </div>
   );
 }
