@@ -1,119 +1,210 @@
-import React, { useContext, useState } from "react"
-import { MovieContext } from "./MovieList"
-import { useHistory, useParams } from 'react-router-dom'
+import React, { useContext, useState } from "react";
+import { MovieContext } from "./MovieList";
+import { useHistory, useParams } from "react-router-dom";
+import { useFormik, yupToFormErrors } from "formik";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import * as yup from 'yup'
+
+toast.configure();
+
+export function VHelp({ message }) {
+  return <p className="help">{ message }</p>
+}
+
+const validationSchema = yup.object({
+    year: yup.number().required().min(1900).max(new Date().getFullYear()),
+    title: yup.string().required(),
+    poster: yup.string().url().required(),
+    plot: yup.string().required(),
+    rated: yup.string().required(),
+    genre: yup.string().required(),
+    rating: yup.number().required().min(0).max(10),
+    votes: yup.number().required().min(0),
+    imdbID: yup.string().required()
+})
 
 export default function MovieForm() {
-    let {movies,setMovie} = useContext(MovieContext);
-    let {mid} = useParams();
+  let { movies, setMovies } = useContext(MovieContext);
+  let { mid } = useParams();
+  const history = useHistory();
 
-    let movie = mid ? movies.find(m => m.id == mid) : {}
-    let[title,setTitle] = useState(movie.title)
-    let[poster,setPoster] = useState(movie.poster)
-    let[plot,setPlot] = useState(movie.plot)
-    let[year,setYear] = useState(movie.year)
-    let[rated,setRated] = useState(movie.rated)
-    let[genre,setGenre] = useState(movie.genre)
-    let[rating,setRating] = useState(movie.rating)
-    let[votes,setVotes] = useState(movie.votes)
-    let[imdbID,setImdbID] = useState(movie.imdbID)
-    let[reviews,setReviews] = useState(movie.reviews)
+  let movie = mid ? movies.find((m) => m.id == mid) : {};
+  let is_new = mid === undefined;
+  let { handleSubmit, handleChange, values, errors } = useFormik({
+    initialValues: is_new
+      ? {
+          title: "",
+          poster: "",
+          plot: "",
+          year: new Date().getFullYear(),
+          rated: "",
+          genre: "",
+          rating: "",
+          votes: "",
+          imdbID: "",
+          reviews: "",
+        }
+      : { ...movie },
+    validationSchema,
+    onSubmit(values) {
+      if (is_new) {
+        let id = movies.length
+        while (true) {
+          let mv = movies.find((m) => m.id == id++);
+          if (mv === undefined) break;
+        }
 
-    const history = useHistory();
-    const submit = e => {
-        e.preventDefault();
-    }
+        values.id = id;
+        movies.push(values);
+      } else {
+        let mv = movies.find((m) => m.id == movie.id);
+        Object.assign(mv, values);
+      }
 
-    return(
-        <form onSubmit={submit}>
-            <h1>Adding/Editing a Movie</h1>
-            <div className="field">
-                <label htmlFor="title">Title</label>
-                <div className="control">
-                    <input type="text" name="title" value={title} onChange={e => setTitle(e.target.value)}/>
-                    <p className="help">Title is required</p>
-                </div>
-            </div>
+      setMovies([...movies]);
+      history.push('/movies');
+      toast(is_new ? "Successfully added" : "Successfully updated");
+    },
+  });
 
-            <div className="field">
-                <label htmlFor="title">Year</label>
-                <div className="control">
-                    <input type="text" name="year" value={year} onChange={e => setYear(e.target.value)}/>
-                    <p className="help">Year is required</p>
-                </div>
-            </div>
+  return (
+    <form onSubmit={handleSubmit}>
+      <h1>Adding/Editing a Movie</h1>
+      <div className="field">
+        <label htmlFor="title">Title</label>
+        <div className="control">
+          <input
+            type="text"
+            name="title"
+            value={values.title}
+            onChange={handleChange}
+          />
+          <VHelp message={errors.title} />
+        </div>
+      </div>
 
-            <div className="field">
-                <label htmlFor="title">Rated</label>
-                <div className="control">
-                    <input type="text" name="rated" value={rated} onChange={e => setRated(e.target.value)}/>
-                    <p className="help">Rated is required</p>
-                </div>
-            </div>
+      <div className="field">
+        <label htmlFor="year">Year</label>
+        <div className="control">
+          <input
+            type="text"
+            name="year"
+            value={values.year}
+            onChange={handleChange}
+          />
+          <VHelp message={errors.year} />
+        </div>
+      </div>
 
-            <div className="field">
-                <label htmlFor="title">Genre</label>
-                <div className="control">
-                    <input type="text" name="year" value={genre} onChange={e => setGenre(e.target.value)}/>
-                    <p className="help">Genre is required</p>
-                </div>
-            </div>
+      <div className="field">
+        <label htmlFor="rated">Rated</label>
+        <div className="control">
+          <input
+            type="text"
+            name="rated"
+            value={values.rated}
+            onChange={handleChange}
+          />
+          <VHelp message={errors.rated} />
+        </div>
+      </div>
 
-            <div className="field">
-                <label htmlFor="poster">Poster</label>
-                <div className="control">
-                    <input type="url" name="poster" value={poster} onChange={e => setPoster(e.target.value)}/>
-                    <p className="help">Poster is required</p>
-                </div>
-            </div>
+      <div className="field">
+        <label htmlFor="genre">Genre</label>
+        <div className="control">
+          <input
+            type="text"
+            name="genre"
+            value={values.genre}
+            onChange={handleChange}
+          />
+          <VHelp message={errors.genre} />
+        </div>
+      </div>
 
-            <div className="field">
-                <label htmlFor="plot">Plot</label>
-                <div className="control">
-                    <textarea name="plot" value={plot} onChange={e => setPlot(e.target.value)}/>
-                    <p className="help">Plot is required</p>
-                </div>
-            </div>
+      <div className="field">
+        <label htmlFor="poster">Poster</label>
+        <div className="control">
+          <input
+            type="url"
+            name="poster"
+            value={values.poster}
+            onChange={handleChange}
+          />
+          <VHelp message={errors.poster} />
+        </div>
+      </div>
 
-            <div className="field">
-                <label htmlFor="title">Rating</label>
-                <div className="control">
-                    <input type="text" name="year" value={rating} onChange={e => setRating(e.target.value)}/>
-                    <p className="help">Rating is required</p>
-                </div>
-            </div>
+      <div className="field">
+        <label htmlFor="plot">Plot</label>
+        <div className="control">
+          <textarea name="plot" value={values.plot} onChange={handleChange} />
+          <VHelp message={errors.plot} />
+        </div>
+      </div>
 
-            <div className="field">
-                <label htmlFor="title">Votes</label>
-                <div className="control">
-                    <input type="text" name="year" value={votes} onChange={e => setVotes(e.target.value)}/>
-                    <p className="help">Votes is required</p>
-                </div>
-            </div>
+      <div className="field">
+        <label htmlFor="rating">Rating</label>
+        <div className="control">
+          <input
+            type="text"
+            name="rating"
+            value={values.rating}
+            onChange={handleChange}
+          />
+          <VHelp message={errors.rating} />
+        </div>
+      </div>
 
-            <div className="field">
-                <label htmlFor="title">ImdbID</label>
-                <div className="control">
-                    <input type="text" name="year" value={imdbID} onChange={e => setImdbID(e.target.value)}/>
-                    <p className="help">ImdbID is required</p>
-                </div>
-            </div>
+      <div className="field">
+        <label htmlFor="votes">Votes</label>
+        <div className="control">
+          <input
+            type="text"
+            name="votes"
+            value={values.votes}
+            onChange={handleChange}
+          />
+          <VHelp message={errors.votes} />
+        </div>
+      </div>
 
-            <div className="field">
-                <label htmlFor="title">Reviews</label>
-                <div className="control">
-                    <input type="text" name="year" value={reviews} onChange={e => setReviews(e.target.value)}/>
-                    <p className="help">Reviews is required</p>
-                </div>
-            </div>
+      <div className="field">
+        <label htmlFor="imdbID">ImdbID</label>
+        <div className="control">
+          <input
+            type="text"
+            name="imdbID"
+            value={values.imdbID}
+            onChange={handleChange}
+          />
+          <VHelp message={errors.imdbID} />
+        </div>
+      </div>
 
-            <div className="field">
-                <label></label>
-                <div className="control">
-                   <button className="primary">Submit</button>
-                   <button className="primary" onClick={ () => history.push('/movies') }>Cancel</button>
-                </div>
-            </div>
+      <div className="field">
+        <label htmlFor="reviews">Reviews</label>
+        <div className="control">
+          <input
+            type="text"
+            name="reviews"
+            value={values.reviews}
+            onChange={handleChange}
+          />
+          <VHelp message={errors.reviews} />
+        </div>
+      </div>
 
-        </form>
-    ) 
+      <div className="field">
+        <label></label>
+        
+          <button className="primary">Submit</button>
+          <button className="primary" onClick={() => history.push("/movies")}>
+            Cancel
+          </button>
+      
+      </div>
+    </form>
+  );
 }
