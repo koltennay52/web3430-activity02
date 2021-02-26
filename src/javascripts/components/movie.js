@@ -6,6 +6,7 @@ import Modal from 'react-modal';
 import { MovieContext } from './MovieList'
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {format} from 'date-fns'
 
 const customStyles = {
   content : {
@@ -40,7 +41,7 @@ export default function Movie(props) {
     <div className="card">
       <img src={m.poster} alt={m.title} />
       <h2>{m.title}</h2>
-      <p>{m.plot}</p>
+      <p>{m.plot} <strong>Release Date</strong>: {format(m.releaseDate, 'MM/dd/yyyy')}</p>
       <ul className="extra">
         <li>
           <StarRating movieRating={m.rating} />

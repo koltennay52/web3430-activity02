@@ -10,6 +10,7 @@ export const top10 = [
         "rating": 9.3,
         "votes": 1078045,
         "imdbID": "tt0111161",
+        "releaseDate": new Date("1990-05-07"),
         "reviews": []
       },
       {
@@ -23,6 +24,7 @@ export const top10 = [
         "rating": 9.2,
         "votes": 762332,
         "imdbID": "tt0068646",
+        "releaseDate": new Date("1990-05-07"),
         "reviews": []
       },
       {
@@ -36,6 +38,7 @@ export const top10 = [
         "rating": 9.0,
         "votes": 496772,
         "imdbID": "tt0071562",
+        "releaseDate": new Date("1990-05-07"),
         "reviews": []
       },
       {
@@ -49,6 +52,7 @@ export const top10 = [
         "rating": 9.0,
         "votes": 843376,
         "imdbID": "tt0110912",
+        "releaseDate": new Date("1990-05-07"),
         "reviews": []
       },
       {
@@ -62,6 +66,7 @@ export const top10 = [
         "rating": 9.0,
         "votes": 325579,
         "imdbID": "tt0060196",
+        "releaseDate": new Date("1990-05-07"),
         "reviews": []
       },
       {
@@ -75,6 +80,7 @@ export const top10 = [
         "rating": 9.0,
         "votes": 1050810,
         "imdbID": "tt0468569",
+        "releaseDate": new Date("1990-05-07"),
         "reviews": []
       },
       {
@@ -88,6 +94,7 @@ export const top10 = [
         "rating": 8.9,
         "votes": 266350,
         "imdbID": "tt0050083",
+        "releaseDate": new Date("1990-05-07"),
         "reviews": []
       },
       {
@@ -101,6 +108,7 @@ export const top10 = [
         "rating": 8.9,
         "votes": 553804,
         "imdbID": "tt0108052",
+        "releaseDate": new Date("1990-05-07"),
         "reviews": []
       },
       {
@@ -114,6 +122,7 @@ export const top10 = [
         "rating": 8.9,
         "votes": 767958,
         "imdbID": "tt0167260",
+        "releaseDate": new Date("1990-05-07"),
         "reviews": []
       },
       {
@@ -127,6 +136,7 @@ export const top10 = [
         "rating": 8.8,
         "votes": 819812,
         "imdbID": "tt0137523",
+        "releaseDate": new Date("1990-05-07"),
         "reviews": [] 
       }
 ]
