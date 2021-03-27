@@ -1,11 +1,11 @@
 let createError = require('http-errors')
 let express = require('express')
 let path = require('path')
-let cookieParse = require('cookie-parser')
+let cookieParser = require('cookie-parser')
 let logger = require('morgan')
 
 //Connect to the database
-import { connect } from './src/javascripts/config/db/connect.js'
+import { connect } from './src/javascripts/config/db/connect'
 connect("mongodb://localhost:27017/topmovies")
 
 // Create a web server 
