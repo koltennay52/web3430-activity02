@@ -7,7 +7,8 @@ export function connect(uri){
 
     mongoose.connect(uri, {
         useNewUrlParser: true,
-        useCreateIndex: true
+        useCreateIndex: true,
+        useUnifiedTopology: true
     })
 
     mongoose.connection.on('connected', () => {

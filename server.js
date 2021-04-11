@@ -4,6 +4,7 @@ let path = require('path')
 let cookieParser = require('cookie-parser')
 let logger = require('morgan')
 
+import { config } from 'process'
 //Connect to the database
 import { connect } from './src/javascripts/config/db/connect'
 connect("mongodb://localhost:27017/topmovies")
@@ -15,21 +16,29 @@ app.set('views', path.join(__dirname, 'src', 'javascripts', 'views'))
 app.set('view engine', 'ejs')
 
 app.use(logger('dev'))
-app.subscribe(express.json())
+app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
+//Authentication
+import passport from 'passport'
+import {strategy} from './src/javascripts/config/passport'
+passport.use(strategy)
+app.use(passport.initialize())
+
 // Routing 
+import {configureRoutes} from './src/javascripts/config/routes'
+configureRoutes(app)
 
 //Handling Errors 
 app.use(function(req, res, next) {
-    next(createError(404))
+    res.render('layout', {content: 'error', err: createError(404), title: "Top 10 Movies"})
 })
 
 app.use(function(err, req, res, next) {
     res.status(err.status || 500)
-    res.render(err)
+    res.render('error', {content: 'error', title: "Top 10 Movies", err: err})
 })
 
 //Create the Web Server 

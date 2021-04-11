@@ -1,40 +1,45 @@
 import React, { useState, createContext, useEffect } from "react";
 import Movie from "./Movie";
-import { Switch, Route, Link, Redirect, useHistory } from "react-router-dom"
-import { About, ErrorNotFound } from "./Pages"
-import MovieForm from "./MovieForm"
+import { Switch, Route, Link, Redirect, useHistory } from "react-router-dom";
+import { About, ErrorNotFound } from "./Pages";
+import MovieForm from "./MovieForm";
+import { useCookies } from 'react-cookie'
 
-export const MovieContext = createContext()
+export const MovieContext = createContext();
 export default function MovieList() {
   const [movies, setMovies] = useState();
+  const [cookies, setCookie, removeCookie] = useCookies(['token'])
+  let [authenticated, setAuthenticated] = useState(cookies.token !== undefined)
   const history = useHistory();
 
   useEffect(() => {
-    fetch('/top10.dat')
-    .then(response => response.text())
-    .then((data) => {
-      setMovies(JSON.parse(data, (key, value) => {
-        const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:.*Z$/
-        if(typeof value === 'string' && dateFormat.test(value)) {
-          return new Date(value)
-        }
-        return value;
-      }))
-    } )
-    .catch(console.error)
-  })
+    if (!movies) {
+      fetch("/api/movies", {
+        credentials: 'same-origin'
+      })
+        .then((response) => response.text())
+        .then((data) => {
+          setMovies(
+            JSON.parse(data, (key, value) => {
+              const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:.*Z$/;
+              if (typeof value === "string" && dateFormat.test(value)) {
+                return new Date(value);
+              }
+              return value;
+            })
+          );
+        })
+        .catch(console.error);
+    }
+  });
 
-  if(!movies)
-    return <p>Loading...</p>
+  if (!movies) return <p>Loading...</p>;
 
   return (
-    <MovieContext.Provider value={{movies,setMovies}}>
-      <nav>
-        <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/movies">List</Link></li>
-          <li><Link to="/about">About</Link></li>
-        </ul>
+    <MovieContext.Provider value={{ movies, setMovies, authenticated, setAuthenticated }}>
+      <div className="pull-content-right">
+
+      </div>
         <Route path="/movies">
           <button
             className="primary"
@@ -45,9 +50,14 @@ export default function MovieList() {
           >
             Sort
           </button>
-          <button className="primary" onClick={()=>history.push('/movies/new')}>Add a New Movie</button>
+          <button
+            className="primary"
+            onClick={() => history.push("/movies/new")}
+          >
+            Add a New Movie
+          </button>
         </Route>
-      </nav>
+
       <main>
         <Switch>
           <Route exact path="/movies">
@@ -65,13 +75,16 @@ export default function MovieList() {
               );
             })}
           </Route>
-          <Route path="/movies/new"><MovieForm></MovieForm></Route>
-          <Route path="/movies/:mid/edit"><MovieForm></MovieForm></Route>
-          <Route path="/about">
-            <About></About>
+          <Route path="/movies/new">
+            <MovieForm></MovieForm>
           </Route>
-          <Redirect from="" to="/movies"/>
-          <Route path="*"><ErrorNotFound/></Route>
+          <Route path="/movies/:mid/edit">
+            <MovieForm></MovieForm>
+          </Route>
+          <Redirect from="" to="/movies" />
+          <Route path="*">
+            <ErrorNotFound />
+          </Route>
         </Switch>
       </main>
     </MovieContext.Provider>
